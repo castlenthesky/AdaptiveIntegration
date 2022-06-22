@@ -1,0 +1,2 @@
+APPPORT=4000
+SECRET_JWT_KEY=secrettoken

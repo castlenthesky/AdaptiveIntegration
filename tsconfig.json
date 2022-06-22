@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es6", /*Specify ECMAScript target version*/
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "rootDir": "src",/*ts source direcotry*/
+    "outDir": "dist", /*where to compile javascript files*/
+    "removeComments": true,
+    "noImplicitAny": true,
+    "declaration": false,
+  },
+  "include": [
+      "**/*"
+  ],
+  "exclude": [
+      "node_modules",
+      "**/*.spec.ts"
+  ]
+}

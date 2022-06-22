@@ -1,0 +1,40 @@
+{
+	"parserOptions": {
+		"parser": "babel-eslint",
+		"sourceType": "module"
+	},
+	"env": {
+		"node": true,
+		"esnext": true
+	},
+	"extends": ["eslint:recommended"],
+	"rules": {
+		"quotes": [
+			"error",
+			"double",
+			{
+				"avoidEscape": true
+			}
+		],
+		"comma-dangle": [
+			"error",
+			{
+				"arrays": "ignore",
+				"objects": "always-multiline",
+				"imports": "never",
+				"exports": "never",
+				"functions": "ignore"
+			}
+		],
+		"arrow-parens": 0,
+		"no-tabs": 0,
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"no-console": 1
+	}
+}

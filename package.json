@@ -1,0 +1,35 @@
+{
+  "name": "template-typescript-basic",
+  "version": "1.0.0",
+  "description": "A boilerplate for developing applications using typescript.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "tsc-watch --onSuccess \"nodemon ./dist/index.js\"",
+    "start": "dist/index.js",
+    "delete": "",
+    "test": "jest --silent --coverage",
+    "test:watch": "jest --silent --coverage --watch --maxWorkers=1"
+  },
+  "author": "Brian Henson",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "@types/node": "^14.14.31",
+    "jest": "^27.4.2",
+    "nodemon": "^2.0.7",
+    "ts-jest": "^27.0.7",
+    "tsc-watch": "^4.2.9",
+    "typescript": "^4.1.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "setupFiles": [
+      "dotenv/config"
+    ]
+  }
+}
