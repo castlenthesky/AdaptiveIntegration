@@ -1,13 +1,13 @@
 import config from "./config";
 import axios from "axios";
+import { parseCSV, parseXML } from "./helpers";
 import * as fs from "fs";
-import * as path from "path";
-
-const outputPath = path.join(__dirname, "test.txt");
-
-const content = "some content!";
 
 const reqURL = "https://api.adaptiveinsights.com/api/v32";
+const reqConfig = {
+  headers: { "Content-Type": "text/xml" },
+};
+
 const reqBody = `<?xml version="1.0" encoding="UTF-8"?>\
 <call method="exportData" callerName="Amazon S3 Export - Budget">\
   <credentials login="finance.integrations@lendio.com" password="W0X!Hu4nD4P!gu" />\
@@ -40,16 +40,17 @@ const reqBody = `<?xml version="1.0" encoding="UTF-8"?>\
   </rules>\
 </call>`;
 
-const reqConfig = {
-  headers: { "Content-Type": "text/xml" },
-};
-
-async function postRequest() {
-  const response = await (await axios.post(reqURL, reqBody, reqConfig)).data;
-  fs.writeFile("test.txt", response, (err) => {
-    console.log("File written successfully.");
-    console.log(`File path: ${outputPath}`);
-  });
+async function fetchData() {
+  return await (
+    await axios.post(reqURL, reqBody, reqConfig)
+  ).data;
 }
 
-postRequest();
+async function main() {
+  const response = await fetchData();
+  const data = parseXML(response);
+  const final = parseCSV(data);
+  fs.writeFile("test.txt", final, () => {});
+}
+
+main();
