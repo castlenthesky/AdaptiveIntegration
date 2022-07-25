@@ -9,6 +9,9 @@
     "noImplicitAny": true,
     "declaration": false,
   },
+  "assets": [
+    "requests/**.xml"
+  ],
   "include": [
       "**/*"
   ],

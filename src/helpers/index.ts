@@ -1,2 +1,7 @@
-export { parseXML } from "./xmlParser";
-export { parseCSV } from "./csvParser";
+export {
+  newLine,
+  outsideQuotesComma,
+  dateTest,
+  unsafeCharacters,
+} from "./regexp";
+export { readRequestFiles } from "./readRequests";
