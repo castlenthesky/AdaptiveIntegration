@@ -4,11 +4,9 @@
   "description": "A boilerplate for developing applications using typescript.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npm clean && tsc",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "serve": "tsc-watch --onSuccess \"nodemon ./dist/index.js --delay 2.5\"",
-    "start": "dist/index.js",
-    "clean": "",
-    "copy-files": "cp ./src/requests ./dist/",
     "test": "jest --silent --coverage",
     "test:watch": "jest --silent --coverage --watch --maxWorkers=1",
     "test:watch:detail": "jest --silent --watch --maxWorkers=1"

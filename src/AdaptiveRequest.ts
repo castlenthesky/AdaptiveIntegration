@@ -63,7 +63,8 @@ export class AdaptiveRequest {
   }
 
   async uploadFile(filename: string) {
-    console.log("Uploading file to Amazon S3");
+    const csvFilename = filename.split(".")[0] + ".csv";
+    console.log(`Uploading ${csvFilename} to Amazon S3`);
     // TODO: Setup S3 Push logic here.
   }
 }
@@ -77,6 +78,7 @@ export async function processRequest(request: {
   await req.processResponse();
   await req.unpivotData();
   await req.writeFile(request.filename);
+  await req.uploadFile(request.filename);
 }
 
 function ensureDirectoryExistence(directory: string) {
