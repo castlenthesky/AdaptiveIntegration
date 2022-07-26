@@ -4,6 +4,7 @@ import axios from "axios";
 import config from "./config";
 import { parseXML, parseCDATA } from "./parsers";
 import * as generateFile from "./fileGenerators";
+import { uploadToBucket } from "./helpers/awsUpload";
 
 export class AdaptiveRequest {
   adaptiveEndpoint: string = config.adaptive.endpoint;
@@ -26,6 +27,7 @@ export class AdaptiveRequest {
     }[];
   };
   unpivotedData: string;
+  outputFile: string;
 
   constructor(public rawXML: string, public filename: string) {
     this.filename = filename;
@@ -62,29 +64,23 @@ export class AdaptiveRequest {
     }
   }
 
-  async unpivotData() {
-    // this.unpivotedData = parseCSV(this.rawData, this.filename);
-  }
-
   async writeFile(outputDirectory: string) {
+    this.outputFile = path.resolve(
+      outputDirectory,
+      `${this.filename.split(".")[0]}.parquet`,
+    );
     ensureDirectoryExistence(path.resolve(outputDirectory));
-    // console.log(this.dataStructure);
     await generateFile.generateParquet(
       outputDirectory,
       this.filename,
       this.dataStructure.data,
     );
-    // ensureDirectoryExistence(path.resolve("exports"));
-    // const csvFilename = filename.split(".")[0] + ".csv";
-    // const outputFile = path.resolve("exports", csvFilename);
-    // console.log(`Writing Data to: ${outputFile}`);
-    // fs.writeFile(outputFile, this.unpivotedData, () => {});
   }
 
   async uploadFile(filename: string) {
-    const csvFilename = filename.split(".")[0] + ".csv";
-    console.log(`Uploading ${csvFilename} to Amazon S3`);
+    console.log(`Uploading ${this.outputFile} to Amazon S3`);
     // TODO: Setup S3 Push logic here.
+    uploadToBucket(this.outputFile, `${this.filename.split(".")[0]}.parquet`);
   }
 }
 
@@ -97,7 +93,7 @@ export async function processRequest(request: {
   await req.processResponse();
   // await req.unpivotData();
   await req.writeFile("exports");
-  // await req.uploadFile(request.filename);
+  await req.uploadFile(this.outputFile);
 }
 
 function ensureDirectoryExistence(directory: string) {
