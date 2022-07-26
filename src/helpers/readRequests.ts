@@ -3,7 +3,7 @@ import * as path from "path";
 
 export async function readRequestFiles() {
   const requestData: { filename: string; body: string }[] = [];
-  const requestDirectory = path.resolve("requests");
+  const requestDirectory = path.resolve("adaptiveRequests");
   const requestFiles = fs.readdirSync(requestDirectory);
 
   for (let index = 0; index < requestFiles.length; index++) {

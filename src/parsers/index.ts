@@ -1,2 +1,2 @@
 export { parseXML } from "./parseXML";
-export { parseCSV } from "./parseCSV";
+export { parseCDATA } from "./parseCDATA";

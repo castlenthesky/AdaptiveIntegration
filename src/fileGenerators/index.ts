@@ -1,0 +1,1 @@
+export { generateParquet } from "./generateParquet";

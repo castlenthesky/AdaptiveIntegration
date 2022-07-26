@@ -2,21 +2,34 @@ import * as fs from "fs";
 import * as path from "path";
 import axios from "axios";
 import config from "./config";
-import { parseXML, parseCSV } from "./parsers";
+import { parseXML, parseCDATA } from "./parsers";
+import * as generateFile from "./fileGenerators";
 
 export class AdaptiveRequest {
   adaptiveEndpoint: string = config.adaptive.endpoint;
   adaptiveUsername: string = config.adaptive.username;
   adaptivePassword: string = config.adaptive.password;
 
-  xmlString: string;
+  requestBody: string;
   rawResponse: string;
   rawData: string;
+  dataStructure: {
+    headers: string[];
+    data: {
+      scenario: string;
+      accountName: string;
+      accountNumber: string;
+      department: string;
+      businessUnit: string;
+      month: string;
+      value: number;
+    }[];
+  };
   unpivotedData: string;
 
   constructor(public rawXML: string, public filename: string) {
     this.filename = filename;
-    this.xmlString = this.generateXML(
+    this.requestBody = this.generateXML(
       rawXML,
       this.adaptiveUsername,
       this.adaptivePassword,
@@ -32,7 +45,7 @@ export class AdaptiveRequest {
   async getData() {
     console.log("Getting Adaptive Data");
     this.rawResponse = await (
-      await axios.post(config.adaptive.endpoint, this.xmlString, {
+      await axios.post(config.adaptive.endpoint, this.requestBody, {
         headers: { "Content-Type": "text/xml" },
       })
     ).data;
@@ -41,9 +54,8 @@ export class AdaptiveRequest {
 
   async processResponse() {
     if (this.rawResponse != null) {
-      console.log("Processing XML Response");
       this.rawData = parseXML(this.rawResponse);
-      console.log("XML Response Processed");
+      this.dataStructure = await parseCDATA(this.rawData, this.filename);
     } else {
       await this.getData();
       this.processResponse();
@@ -51,15 +63,22 @@ export class AdaptiveRequest {
   }
 
   async unpivotData() {
-    this.unpivotedData = parseCSV(this.rawData, this.filename);
+    // this.unpivotedData = parseCSV(this.rawData, this.filename);
   }
 
-  async writeFile(filename: string) {
-    ensureDirectoryExistence(path.resolve("exports"));
-    const csvFilename = filename.split(".")[0] + ".csv";
-    const outputFile = path.resolve("exports", csvFilename);
-    console.log(`Writing Data to: ${outputFile}`);
-    fs.writeFile(outputFile, this.unpivotedData, () => {});
+  async writeFile(outputDirectory: string) {
+    ensureDirectoryExistence(path.resolve(outputDirectory));
+    // console.log(this.dataStructure);
+    await generateFile.generateParquet(
+      outputDirectory,
+      this.filename,
+      this.dataStructure.data,
+    );
+    // ensureDirectoryExistence(path.resolve("exports"));
+    // const csvFilename = filename.split(".")[0] + ".csv";
+    // const outputFile = path.resolve("exports", csvFilename);
+    // console.log(`Writing Data to: ${outputFile}`);
+    // fs.writeFile(outputFile, this.unpivotedData, () => {});
   }
 
   async uploadFile(filename: string) {
@@ -76,9 +95,9 @@ export async function processRequest(request: {
   let req = new AdaptiveRequest(request.body, request.filename);
   await req.getData();
   await req.processResponse();
-  await req.unpivotData();
-  await req.writeFile(request.filename);
-  await req.uploadFile(request.filename);
+  // await req.unpivotData();
+  await req.writeFile("exports");
+  // await req.uploadFile(request.filename);
 }
 
 function ensureDirectoryExistence(directory: string) {
