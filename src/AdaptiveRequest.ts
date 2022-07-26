@@ -91,9 +91,8 @@ export async function processRequest(request: {
   let req = new AdaptiveRequest(request.body, request.filename);
   await req.getData();
   await req.processResponse();
-  // await req.unpivotData();
   await req.writeFile("exports");
-  await req.uploadFile(this.outputFile);
+  // await req.uploadFile(this.outputFile);
 }
 
 function ensureDirectoryExistence(directory: string) {
