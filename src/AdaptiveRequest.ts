@@ -119,7 +119,7 @@ export async function processRequest(request: {
   let req = new AdaptiveRequest(request.body, request.filename);
   await req.getData();
   await req.processResponse();
-  await req.writeFile(["json", "csv"]);
+  await req.writeFile(["json"]);
   await req.uploadFile(this.outputFile);
 }
 
