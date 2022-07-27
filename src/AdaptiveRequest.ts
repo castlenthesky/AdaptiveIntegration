@@ -6,39 +6,43 @@ import { parseXML, parseCDATA } from "./parsers";
 import * as generateFile from "./fileGenerators";
 import { uploadToBucket } from "./helpers/awsUpload";
 
+export interface IAdaptiveData {
+  scenario: string;
+  accountName: string;
+  accountNumber: string;
+  department: string;
+  businessUnit: string;
+  month: string;
+  value: number;
+}
+
 export class AdaptiveRequest {
+  outputPath: string = path.resolve("exports");
   adaptiveEndpoint: string = config.adaptive.endpoint;
   adaptiveUsername: string = config.adaptive.username;
   adaptivePassword: string = config.adaptive.password;
 
+  outputFile: string;
+  scenario: string;
   requestBody: string;
-  rawResponse: string;
-  rawData: string;
+  adaptiveResponse: string;
+  adaptiveCDATA: string;
   dataStructure: {
     headers: string[];
-    data: {
-      scenario: string;
-      accountName: string;
-      accountNumber: string;
-      department: string;
-      businessUnit: string;
-      month: string;
-      value: number;
-    }[];
+    data: IAdaptiveData[];
   };
-  unpivotedData: string;
-  outputFile: string;
 
-  constructor(public rawXML: string, public filename: string) {
-    this.filename = filename;
-    this.requestBody = this.generateXML(
+  constructor(public rawXML: string, public xmlFilename: string) {
+    this.xmlFilename = xmlFilename;
+    this.scenario = xmlFilename.split(".")[0];
+    this.requestBody = this.generateRequestBody(
       rawXML,
       this.adaptiveUsername,
       this.adaptivePassword,
     );
   }
 
-  generateXML(xmlString: string, username: string, password: string) {
+  generateRequestBody(xmlString: string, username: string, password: string) {
     return xmlString
       .replace("<<USERNAME>>", username)
       .replace("<<PASSWORD>>", password);
@@ -46,7 +50,7 @@ export class AdaptiveRequest {
 
   async getData() {
     console.log("Getting Adaptive Data");
-    this.rawResponse = await (
+    this.adaptiveResponse = await (
       await axios.post(config.adaptive.endpoint, this.requestBody, {
         headers: { "Content-Type": "text/xml" },
       })
@@ -55,32 +59,56 @@ export class AdaptiveRequest {
   }
 
   async processResponse() {
-    if (this.rawResponse != null) {
-      this.rawData = parseXML(this.rawResponse);
-      this.dataStructure = await parseCDATA(this.rawData, this.filename);
+    if (this.adaptiveResponse != null) {
+      this.adaptiveCDATA = parseXML(this.adaptiveResponse);
+      this.dataStructure = await parseCDATA(this.adaptiveCDATA, this.scenario);
     } else {
       await this.getData();
       this.processResponse();
     }
   }
 
-  async writeFile(outputDirectory: string) {
-    this.outputFile = path.resolve(
-      outputDirectory,
-      `${this.filename.split(".")[0]}.parquet`,
-    );
-    ensureDirectoryExistence(path.resolve(outputDirectory));
-    await generateFile.generateParquet(
-      outputDirectory,
-      this.filename,
-      this.dataStructure.data,
-    );
+  async writeFile(outputFormatArray: string[]) {
+    ensureDirectoryExistence(this.outputPath);
+    for (let i = 0; i < outputFormatArray.length; i++) {
+      switch (outputFormatArray[i]) {
+        case "csv":
+          generateFile.generateCSV(
+            this.outputPath,
+            this.scenario,
+            this.dataStructure.data,
+          );
+          break;
+        case "parquet":
+          console.log("Generating .parquet file...");
+          generateFile.generateParquet(
+            this.outputPath,
+            this.scenario,
+            this.dataStructure.data,
+          );
+          // await this.uploadFile();
+          break;
+        case "json":
+          generateFile.generateJSON(
+            this.outputPath,
+            this.scenario,
+            this.dataStructure.data,
+          );
+          break;
+        default:
+          generateFile.generateCSV(
+            this.outputPath,
+            this.scenario,
+            this.dataStructure.data,
+          );
+          break;
+      }
+    }
   }
 
   async uploadFile(filename: string) {
     console.log(`Uploading ${this.outputFile} to Amazon S3`);
-    // TODO: Setup S3 Push logic here.
-    uploadToBucket(this.outputFile, `${this.filename.split(".")[0]}.parquet`);
+    uploadToBucket(this.outputFile, `${this.scenario}.parquet`);
   }
 }
 
@@ -91,8 +119,8 @@ export async function processRequest(request: {
   let req = new AdaptiveRequest(request.body, request.filename);
   await req.getData();
   await req.processResponse();
-  await req.writeFile("exports");
-  // await req.uploadFile(this.outputFile);
+  await req.writeFile(["json", "csv"]);
+  await req.uploadFile(this.outputFile);
 }
 
 function ensureDirectoryExistence(directory: string) {
