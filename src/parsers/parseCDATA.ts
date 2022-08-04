@@ -6,7 +6,7 @@ import {
 } from "../helpers/regexp";
 
 export async function parseCDATA(rawCDATA: string, filename: string) {
-  console.log(`Processing CDATA: ${filename}`);
+  console.log(`${filename}: Processing CDATA`);
   const { rawHeaderString, rawDataArray } = splitHeaderFromData(rawCDATA);
   const processedHeaders = processHeaders(rawHeaderString);
   const fixedHeaderColumnCount = countFixedColumns(processedHeaders);

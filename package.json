@@ -52,5 +52,11 @@
       "text"
     ],
     "coverageDirectory": "./output/code-coverage/"
+  },
+  "nodemonConfig": {
+    "delay": 2500,
+    "ignore": [
+      "*/exports/*"
+    ]
   }
 }

@@ -4,7 +4,7 @@ import axios from "axios";
 import config from "./config";
 import { parseXML, parseCDATA } from "./parsers";
 import * as generateFile from "./fileGenerators";
-import { uploadToBucket } from "./helpers/awsUpload";
+import { uploadFileToBucket } from "./helpers/awsUpload";
 
 export interface IAdaptiveData {
   scenario: string;
@@ -18,11 +18,11 @@ export interface IAdaptiveData {
 
 export class AdaptiveRequest {
   outputPath: string = path.resolve("exports");
+
   adaptiveEndpoint: string = config.adaptive.endpoint;
   adaptiveUsername: string = config.adaptive.username;
   adaptivePassword: string = config.adaptive.password;
 
-  outputFile: string;
   scenario: string;
   requestBody: string;
   adaptiveResponse: string;
@@ -49,67 +49,46 @@ export class AdaptiveRequest {
   }
 
   async getData() {
-    console.log("Getting Adaptive Data");
-    this.adaptiveResponse = await (
+    console.log(`${this.scenario}: Getting Adaptive Data`);
+    return (this.adaptiveResponse = await (
       await axios.post(config.adaptive.endpoint, this.requestBody, {
         headers: { "Content-Type": "text/xml" },
       })
-    ).data;
-    console.log("Response Received");
+    ).data);
   }
 
   async processResponse() {
     if (this.adaptiveResponse != null) {
-      this.adaptiveCDATA = parseXML(this.adaptiveResponse);
-      this.dataStructure = await parseCDATA(this.adaptiveCDATA, this.scenario);
+      this.adaptiveCDATA = await parseXML(this.adaptiveResponse);
+      return (this.dataStructure = await parseCDATA(
+        this.adaptiveCDATA,
+        this.scenario,
+      ));
     } else {
       await this.getData();
       this.processResponse();
     }
   }
 
-  async writeFile(outputFormatArray: string[]) {
-    ensureDirectoryExistence(this.outputPath);
-    for (let i = 0; i < outputFormatArray.length; i++) {
-      switch (outputFormatArray[i]) {
-        case "csv":
-          generateFile.generateCSV(
-            this.outputPath,
-            this.scenario,
-            this.dataStructure.data,
-          );
-          break;
-        case "parquet":
-          console.log("Generating .parquet file...");
-          generateFile.generateParquet(
-            this.outputPath,
-            this.scenario,
-            this.dataStructure.data,
-          );
-          // await this.uploadFile();
-          break;
-        case "json":
-          generateFile.generateJSON(
-            this.outputPath,
-            this.scenario,
-            this.dataStructure.data,
-          );
-          break;
-        default:
-          generateFile.generateCSV(
-            this.outputPath,
-            this.scenario,
-            this.dataStructure.data,
-          );
-          break;
-      }
-    }
+  async uploadSnowflakeFile() {
+    console.log(`${this.scenario}: Uploading to S3 Bucket`);
+    return uploadFileToBucket({
+      filename: this.scenario + ".json",
+      body: await generateFile.writeSnowflakeString(this.dataStructure.data),
+    });
   }
+}
 
-  async uploadFile(filename: string) {
-    console.log(`Uploading ${this.outputFile} to Amazon S3`);
-    uploadToBucket(this.outputFile, `${this.scenario}.parquet`);
-  }
+export async function processAllRequests(
+  requestSet: {
+    filename: string;
+    body: string;
+  }[],
+) {
+  requestSet.forEach((request) => {
+    processRequest(request);
+  });
+  return;
 }
 
 export async function processRequest(request: {
@@ -119,14 +98,14 @@ export async function processRequest(request: {
   let req = new AdaptiveRequest(request.body, request.filename);
   await req.getData();
   await req.processResponse();
-  await req.writeFile(["json"]);
-  await req.uploadFile(this.outputFile);
+  // await req.writeSnowflakeFile();
+  await req.uploadSnowflakeFile();
 }
 
-function ensureDirectoryExistence(directory: string) {
-  if (fs.existsSync(directory)) {
-    return true;
-  } else {
-    fs.mkdirSync(directory);
-  }
-}
+// function ensureDirectoryExistence(directory: string) {
+//   if (fs.existsSync(directory)) {
+//     return true;
+//   } else {
+//     fs.mkdirSync(directory);
+//   }
+// }

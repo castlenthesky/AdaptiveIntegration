@@ -4,4 +4,4 @@ export {
   dateTest,
   unsafeCharacters,
 } from "./regexp";
-export { readRequestFiles } from "./readRequests";
+export { readFolderContents } from "./readFiles";

@@ -1,11 +1,13 @@
-import { readRequestFiles } from "./helpers";
-import { processRequest } from "./AdaptiveRequest";
+import { readFolderContents } from "./helpers";
+import { processAllRequests } from "./AdaptiveRequest";
+import { uploadFolderContentsToBucket } from "./helpers/awsUpload";
+import * as path from "path";
 
 async function main() {
-  const requestSet = await readRequestFiles();
-  requestSet.forEach((request) => {
-    processRequest(request);
-  });
+  const requestSet = await readFolderContents("adaptiveRequests");
+  await processAllRequests(requestSet);
+  // await uploadFolderContentsToBucket(path.resolve("exports", "snowflake"));
+  // await uploadFolderContentsToBucket("exports");
 }
 
 main();

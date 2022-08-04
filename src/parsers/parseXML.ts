@@ -1,7 +1,7 @@
 import { Parser } from "xml2js";
 const parser = new Parser();
 
-export function parseXML(xmlString: string): string {
+export async function parseXML(xmlString: string): Promise<string> {
   console.log("Processing XML Response: Extracting CDATA");
   let results = "";
   parser.parseString(xmlString, (error, result) => {
