@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<call method="exportData" callerName="Lendio Finance Snowflake Connector">
+  <credentials login="<<USERNAME>>" password="<<PASSWORD>>" />
+  <version name="Plan 2022 - H1 Final" isDefault="false"/>
+  <format useInternalCodes="true" includeUnmappedItems="false" />
+  <filters>
+    <accounts>
+      <account code="Bus_Unit_IS.Revenue" isAssumption="false" includeDescendants="true"/>
+      <account code="Bus_Unit_IS.COGS" isAssumption="false" includeDescendants="true"/>
+      <account code="Bus_Unit_IS.Expense" isAssumption="false" includeDescendants="true"/>
+      <account code="Bus_Unit_IS.Expenses_Capitalized" isAssumption="false" includeDescendants="true"/>
+      <account code="Bus_Unit_IS.Depr_Amort" isAssumption="false" includeDescendants="true"/>
+      <account code="Bus_Unit_IS.Non_Operating_Income" isAssumption="false" includeDescendants="true"/>
+      <account code="Bus_Unit_IS.Non_Operating_Expense" isAssumption="false" includeDescendants="true"/>
+      <account code="Bus_Unit_IS.GAAP_Adj" isAssumption="false" includeDescendants="true"/>
+    </accounts>
+    <levels>
+      <level name="Lendio Inc Consolidated" isRollup="true" includeDescendants="true"/>
+    </levels>
+    <timeSpan start="01/2022" end="06/2022"/>
+  </filters>
+  <dimensions>
+    <dimension name="Business_Unit"/>
+  </dimensions>
+  <rules includeZeroRows="false" markInvalidValues="false" markBlanks="false">
+    <currency useCorporate="true" useLocal="false"/>
+  </rules>
+</call>

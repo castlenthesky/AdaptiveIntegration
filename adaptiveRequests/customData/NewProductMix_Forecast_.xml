@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<call method="exportData" callerName="Lendio Finance Snowflake Connector">
+  <credentials login="<<USERNAME>>" password="<<PASSWORD>>" />
+  <version name="Working Forecast" isDefault="false"/>
+  <format useInternalCodes="true" includeUnmappedItems="false" />
+  <filters>
+    <accounts>
+      <account code="PROD_SALES.Portfolio_Count" isAssumption="false" includeDescendants="false"/>
+      <account code="PROD_SALES.Portfolio_Pct" isAssumption="false" includeDescendants="false"/>
+      <account code="PROD_SALES.LoanVolume" isAssumption="false" includeDescendants="false"/>
+      <account code="PROD_SALES.LoanVolume_Average" isAssumption="false" includeDescendants="false"/>
+      <account code="PROD_SALES.Rev_OriginationRate" isAssumption="false" includeDescendants="false"/>
+      <account code="PROD_SALES.Rev_OriginationRevenue" isAssumption="false" includeDescendants="false"/>
+    </accounts>
+    <levels>
+      <level name="Lendio Inc Consolidated" isRollup="false" includeDescendants="true"/>
+    </levels>
+    <timeSpan start="01/2023" end="12/2023"/>
+  </filters>
+  <dimensions>
+    <dimension name="Marketplace_Loan_Types"/>
+  </dimensions>
+  <rules includeZeroRows="false" markInvalidValues="false" markBlanks="false">
+    <currency useCorporate="true" useLocal="false"/>
+  </rules>
+</call>

@@ -16,6 +16,7 @@ export async function parseCDATA(rawCDATA: string, filename: string) {
     fixedHeaderColumnCount,
     filename.split(".")[0],
   );
+  // console.log({ headers: processedHeaders, data: processedData });
   return {
     headers: processedHeaders,
     data: processedData,
@@ -56,7 +57,7 @@ function countFixedColumns(headers: string[]): number {
 
 function processDataRow(
   rawRowString: string,
-  scenario: string,
+  filename: string,
   headers: string[],
   fixedHeaderColumnCount: number,
 ) {
@@ -71,7 +72,8 @@ function processDataRow(
       continue;
     }
     rowObjects.push({
-      scenario: scenario,
+      dataset: filename.split("_")[0],
+      scenario: filename.split("_")[1],
       accountName: rowElements[0].replace(/["]/g, ""),
       accountNumber: rowElements[1].split(".")[1].replace(/["]/g, ""),
       department: cleanDepartmentName(rowElements[2]),

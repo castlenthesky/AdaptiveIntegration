@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<call method="exportData" callerName="Lendio Finance Snowflake Connector">
+  <credentials login="<<USERNAME>>" password="<<PASSWORD>>" />
+  <version name="Plan 2023 - FY Board Plan (Adjusted Q2)" isDefault="false"/>
+  <format useInternalCodes="true" includeUnmappedItems="false" />
+  <filters>
+    <accounts>
+      <account code="WorkdaysInMonth" isAssumption="true" includeDescendants="false"/>
+      <account code="FunnelPct_MQLAssigned" isAssumption="true" includeDescendants="false"/>
+      <account code="FunnelPct_AppSubmission" isAssumption="true" includeDescendants="false"/>
+      <account code="FunnelPct_OfferReceived" isAssumption="true" includeDescendants="false"/>
+      <account code="FunnelPct_OfferAccepted" isAssumption="true" includeDescendants="false"/>
+      <account code="MQLCount_Direct" isAssumption="true" includeDescendants="false"/>
+      <account code="MQLCount_Partner" isAssumption="true" includeDescendants="false"/>
+      <account code="MQLCount_Affiliate" isAssumption="true" includeDescendants="false"/>
+      <account code="MQLCount_LenderTech" isAssumption="true" includeDescendants="false"/>
+      <account code="FunnelNumber_MQLCount" isAssumption="true" includeDescendants="false"/>
+      <account code="FunnelNumber_Claimed" isAssumption="true" includeDescendants="false"/>
+      <account code="FunnelNumber_Submitted" isAssumption="true" includeDescendants="false"/>
+      <account code="FunnelNumber_OfferReceived" isAssumption="true" includeDescendants="false"/>
+      <account code="FunnelNumber_Closed" isAssumption="true" includeDescendants="false"/>
+      <account code="Revenue_Marketplace_Origination" isAssumption="true" includeDescendants="false"/>
+    </accounts>
+    <levels>
+      <level name="Lendio Inc Consolidated" isRollup="false" includeDescendants="false"/>
+    </levels>
+    <timeSpan start="03/2023" end="04/2023"/>
+  </filters>
+  <rules includeZeroRows="false" markInvalidValues="false" markBlanks="false">
+    <currency useCorporate="true" useLocal="false"/>
+  </rules>
+</call>

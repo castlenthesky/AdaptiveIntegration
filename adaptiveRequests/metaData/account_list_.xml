@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<call method="exportAccounts" callerName="Lendio Finance Snowflake Connector">
+  <credentials login="<<USERNAME>>" password="<<PASSWORD>>"/>
+</call>

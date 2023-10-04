@@ -1,5 +1,7 @@
 # Data Exports
-exports
+exports/**
+
+snowbinding
 
 # Logs
 logs

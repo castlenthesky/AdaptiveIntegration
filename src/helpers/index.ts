@@ -3,5 +3,5 @@ export {
   outsideQuotesComma,
   dateTest,
   unsafeCharacters,
+  isNumberedValue,
 } from "./regexp";
-export { readFolderContents } from "./readFiles";
