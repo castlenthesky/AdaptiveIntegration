@@ -1,10 +1,7 @@
-import * as fs from "fs";
 import * as path from "path";
 import axios from "axios";
 import config from "./config";
 import { parseXML, parseCDATA } from "./parsers";
-import * as generateFile from "./fileGenerators";
-import { uploadFileToBucket } from "./helpers/awsUpload";
 import {
   processAccountAttributes,
   processAccounts,

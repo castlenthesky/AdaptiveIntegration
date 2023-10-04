@@ -1,7 +1,5 @@
 import { processAllRequests } from "./AdaptiveRequest";
-import { collectRequestsFromDirectories } from "./fileHandeling";
-// import { uploadFolderContentsToBucket } from "./helpers/awsUpload";
-// import * as path from "path";
+import { collectRequestsFromDirectories } from "./helpers/fileHandeling";
 
 // 1. Gather List of Requests for Submission to Adaptive API
 const targetDirectoryList = ["financialData", "metaData"];
